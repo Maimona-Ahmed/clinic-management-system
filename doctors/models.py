@@ -10,6 +10,12 @@ class DoctorProfile(models.Model):
         related_name="doctor_profile",
     )
 
+    profile_image = models.ImageField(
+        upload_to="doctors/profile",
+        blank=True,
+        null= True
+    )
+
     specialization = models.CharField(
         max_length=100
     )

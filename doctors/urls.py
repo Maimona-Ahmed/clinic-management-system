@@ -1,12 +1,20 @@
-
+from django.urls import path
 from rest_framework.routers import DefaultRouter
-from .views import DoctorViewSet,DoctorScheduleViewSet,DoctorTimeOffViewSet
+
+from .views import (
+    DoctorViewSet,
+    DoctorScheduleViewSet,
+    DoctorTimeOffViewSet,
+    DoctorDashboardView,
+)
+
 
 router = DefaultRouter()
+
 router.register(
     "doctors",
     DoctorViewSet,
-    basename="doctor"
+    basename="doctor",
 )
 
 router.register(
@@ -15,7 +23,6 @@ router.register(
     basename="doctor-schedule",
 )
 
-
 router.register(
     "doctor-time-offs",
     DoctorTimeOffViewSet,
@@ -23,4 +30,12 @@ router.register(
 )
 
 
-urlpatterns = router.urls
+urlpatterns = [
+    path(
+        "doctors/dashboard/",
+        DoctorDashboardView.as_view(),
+        name="doctor-dashboard",
+    ),
+]
+
+urlpatterns += router.urls

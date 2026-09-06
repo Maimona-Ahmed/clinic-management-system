@@ -5,6 +5,7 @@ from django.contrib.auth.password_validation import (
 )
 from django.db import transaction
 from rest_framework import serializers
+from appointments.models import Appointment
 from .models import DoctorProfile,DoctorSchedule,DoctorTimeOff
 from services.models import DoctorService
 
@@ -38,6 +39,9 @@ class DoctorSerializer(serializers.ModelSerializer):
         source="user.email",
         read_only=True,
     )
+    profile_image = serializers.ImageField(
+        read_only =True
+    )
 
     first_name = serializers.CharField(
         source="user.first_name",
@@ -61,6 +65,7 @@ class DoctorSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "email",
+            "profile_image",
             "first_name",
             "last_name",
             "specialization",
@@ -81,6 +86,10 @@ class DoctorSerializer(serializers.ModelSerializer):
 
 class DoctorCreateSerializer( serializers.Serializer):
     email = serializers.EmailField()
+    profile_image = serializers.ImageField(
+            required=False,
+            allow_null=True
+        )
     first_name = serializers.CharField(
         max_length=150
     )
@@ -274,6 +283,52 @@ class DoctorTimeOffSerializer(serializers.ModelSerializer):
             })
 
         return attrs
+
+
+class DashboardStatisticsSerializer(
+    serializers.Serializer
+):
+
+    total_appointments = serializers.IntegerField()
+
+    today_appointments = serializers.IntegerField()
+
+    pending_appointments = serializers.IntegerField()
+
+    confirmed_appointments = serializers.IntegerField()
+
+    completed_appointments = serializers.IntegerField()
+
+    cancelled_appointments = serializers.IntegerField()
+
+
+class DashboardAppointmentSerializer(
+    serializers.ModelSerializer
+):
+
+    patient_name = serializers.SerializerMethodField()
+
+    service_name = serializers.CharField(
+        source="doctor_service.service.name",
+        read_only=True,
+    )
+
+    class Meta:
+        model = Appointment
+
+        fields = [
+            "id",
+            "patient_name",
+            "service_name",
+            "appointment_date",
+            "appointment_time",
+            "status",
+        ]
+
+    def get_patient_name(self, obj):
+
+        return obj.patient.user.get_full_name()
+
 
 
 

@@ -1,6 +1,15 @@
 from rest_framework import status, viewsets
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework.response import Response
+from datetime import date
+
+from django.db.models import Count, Q
+
+from rest_framework import status
+from rest_framework.views import APIView
+
+from appointments.models import Appointment
+
 
 from .models import DoctorProfile,DoctorSchedule,DoctorTimeOff
 from .permissions import IsAdminUser,DoctorSchedulePermission
@@ -8,7 +17,9 @@ from .serializers import (
     DoctorSerializer,
     DoctorCreateSerializer,
     DoctorScheduleSerializer,
-    DoctorTimeOffSerializer
+    DoctorTimeOffSerializer,
+    DashboardStatisticsSerializer,
+    DashboardAppointmentSerializer,
     
 )
 
@@ -151,3 +162,165 @@ class DoctorTimeOffViewSet(viewsets.ModelViewSet):
         serializer.save(
             doctor=self.request.user.doctor_profile
         )
+
+
+
+class DoctorDashboardView(APIView):
+
+    permission_classes = [
+        IsAuthenticated,
+    ]
+
+    def get(self, request):
+
+        return Response({
+            "message": "Doctor Dashboard works!"
+        })
+
+    permission_classes = [
+        IsAuthenticated,
+    ]
+
+    def get(self, request):
+
+        # ==========================================
+        # 1. Current Doctor
+        # ==========================================
+
+        if not hasattr(
+            request.user,
+            "doctor_profile",
+        ):
+
+            return Response(
+                {
+                    "detail": (
+                        "Only doctors can access "
+                        "the doctor dashboard."
+                    )
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        doctor = request.user.doctor_profile
+
+        # ==========================================
+        # 2. Doctor Appointments
+        # ==========================================
+
+        appointments = (
+            Appointment.objects
+            .select_related(
+                "patient",
+                "patient__user",
+                "doctor",
+                "doctor_service",
+                "doctor_service__service",
+            )
+            .filter(
+                doctor=doctor
+            )
+        )
+
+        # ==========================================
+        # 3. Today
+        # ==========================================
+
+        today = date.today()
+
+        # ==========================================
+        # 4. Statistics
+        # ==========================================
+
+        statistics = appointments.aggregate(
+
+            total_appointments=Count(
+                "id"
+            ),
+
+            today_appointments=Count(
+                "id",
+                filter=Q(
+                    appointment_date=today
+                ),
+            ),
+
+            pending_appointments=Count(
+                "id",
+                filter=Q(
+                    status=Appointment.Status.PENDING
+                ),
+            ),
+
+            confirmed_appointments=Count(
+                "id",
+                filter=Q(
+                    status=Appointment.Status.CONFIRMED
+                ),
+            ),
+
+            completed_appointments=Count(
+                "id",
+                filter=Q(
+                    status=Appointment.Status.COMPLETED
+                ),
+            ),
+
+            cancelled_appointments=Count(
+                "id",
+                filter=Q(
+                    status=Appointment.Status.CANCELLED
+                ),
+            ),
+        )
+
+        # ==========================================
+        # 5. Statistics Serializer
+        # ==========================================
+
+        statistics_serializer = (
+            DashboardStatisticsSerializer(
+                statistics
+            )
+        )
+
+        # ==========================================
+        # 6. Today's Appointments
+        # ==========================================
+
+        today_appointments = (
+            appointments
+            .filter(
+                appointment_date=today
+            )
+            .order_by(
+                "appointment_time"
+            )
+        )
+
+        # ==========================================
+        # 7. Today's Appointments Serializer
+        # ==========================================
+
+        today_serializer = (
+            DashboardAppointmentSerializer(
+                today_appointments,
+                many=True,
+            )
+        )
+
+        # ==========================================
+        # 8. Response
+        # ==========================================
+
+        return Response(
+            {
+                "statistics":
+                    statistics_serializer.data,
+
+                "today_appointments":
+                    today_serializer.data,
+            },
+            status=status.HTTP_200_OK,
+        )
+

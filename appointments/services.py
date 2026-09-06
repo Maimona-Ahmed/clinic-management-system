@@ -1,4 +1,6 @@
 from django.db import IntegrityError, transaction
+from datetime import datetime, timedelta
+
 from rest_framework.exceptions import ValidationError
 
 from doctors.models import (
@@ -553,3 +555,168 @@ class AppointmentService:
         )
 
         return appointment
+
+
+class SlotService:
+
+    @staticmethod
+    def get_available_slots(
+        doctor,
+        doctor_service,
+        appointment_date,
+    ):
+
+        # ==========================================
+        # 1. Get all active schedules
+        # ==========================================
+
+        weekday = appointment_date.weekday()
+
+        schedules = (
+            doctor.schedules
+            .filter(
+                day_of_week=weekday,
+                is_active=True,
+            )
+            .order_by("start_time")
+        )
+
+        if not schedules.exists():
+            return []
+
+
+        # ==========================================
+        # 2. Check Time Off
+        # ==========================================
+
+        has_time_off = (
+            doctor.time_offs
+            .filter(
+                start_date__lte=appointment_date,
+                end_date__gte=appointment_date,
+                is_active=True,
+            )
+            .exists()
+        )
+
+        if has_time_off:
+            return []
+
+
+        # ==========================================
+        # 3. Service Duration
+        # ==========================================
+
+        slot_duration = timedelta(
+            minutes=doctor_service.duration
+        )
+
+
+        # ==========================================
+        # 4. Existing Appointments
+        # ==========================================
+
+        appointments = (
+            Appointment.objects
+            .filter(
+                doctor=doctor,
+                appointment_date=appointment_date,
+                status__in=[
+                    Appointment.Status.PENDING,
+                    Appointment.Status.CONFIRMED,
+                ],
+            )
+            .select_related("doctor_service")
+            .order_by("appointment_time")
+        )
+
+
+        # ==========================================
+        # 5. Generate Slots
+        # ==========================================
+
+        slots = []
+
+
+        for schedule in schedules:
+
+            current_datetime = datetime.combine(
+                appointment_date,
+                schedule.start_time,
+            )
+
+            end_datetime = datetime.combine(
+                appointment_date,
+                schedule.end_time,
+            )
+
+
+            while (
+                current_datetime + slot_duration
+                <= end_datetime
+            ):
+
+                slot_start = current_datetime
+
+                slot_end = (
+                    current_datetime
+                    + slot_duration
+                )
+
+
+                # ==================================
+                # Check Appointment Conflict
+                # ==================================
+
+                is_available = True
+
+
+                for appointment in appointments:
+
+                    appointment_start = datetime.combine(
+                        appointment_date,
+                        appointment.appointment_time,
+                    )
+
+                    appointment_end = (
+                        appointment_start
+                        + timedelta(
+                            minutes=appointment
+                            .doctor_service
+                            .duration
+                        )
+                    )
+
+
+                    # Time overlap
+
+                    if (
+                        slot_start < appointment_end
+                        and
+                        slot_end > appointment_start
+                    ):
+
+                        is_available = False
+
+                        break
+
+
+                # ==================================
+                # Add Slot
+                # ==================================
+
+                slots.append(
+                    {
+                        "time": slot_start.strftime(
+                            "%H:%M"
+                        ),
+                        "available": is_available,
+                    }
+                )
+
+
+                current_datetime += slot_duration
+
+
+        return slots
+

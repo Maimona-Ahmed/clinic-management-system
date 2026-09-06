@@ -10,12 +10,28 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from .models import Appointment
+from doctors.models import DoctorProfile
+from services.models import DoctorService
 
 from .permissions import AppointmentPermission
 
-from .serializers import AppointmentSerializer
+from .serializers import AppointmentSerializer,AppointmentSlotQuerySerializer
 
-from .services import AppointmentService
+from .services import AppointmentService,SlotService
+from rest_framework import (
+    status,
+    viewsets,
+)
+
+
+from rest_framework.permissions import (
+    AllowAny,
+    IsAuthenticated,
+)
+
+
+from rest_framework.views import APIView
+
 
 
 class AppointmentViewSet(
@@ -456,4 +472,134 @@ class AppointmentViewSet(
             serializer.data,
             status=status.HTTP_200_OK,
         )
+
+class DoctorSlotView(APIView):
+
+    permission_classes = [
+        AllowAny
+    ]
+
+    def get(self, request):
+
+        # ==========================================
+        # 1. Validate Query Parameters
+        # ==========================================
+
+        serializer = (
+            AppointmentSlotQuerySerializer(
+                data=request.query_params
+            )
+        )
+
+        serializer.is_valid(
+            raise_exception=True
+        )
+
+        doctor_id = (
+            serializer.validated_data[
+                "doctor"
+            ]
+        )
+
+        service_id = (
+            serializer.validated_data[
+                "service"
+            ]
+        )
+
+        appointment_date = (
+            serializer.validated_data[
+                "date"
+            ]
+        )
+
+
+        # ==========================================
+        # 2. Get Doctor
+        # ==========================================
+
+        try:
+
+            doctor = (
+                DoctorProfile.objects
+                .get(id=doctor_id)
+            )
+
+        except DoctorProfile.DoesNotExist:
+
+            return Response(
+                {
+                    "detail":
+                        "Doctor not found."
+                },
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+
+        # ==========================================
+        # 3. Get Doctor Service
+        # ==========================================
+
+        try:
+
+            doctor_service = (
+                DoctorService.objects
+                .select_related("doctor")
+                .get(
+                    id=service_id,
+                    doctor=doctor,
+                    is_active=True,
+                )
+            )
+
+        except DoctorService.DoesNotExist:
+
+            return Response(
+                {
+                    "detail":
+                        "Service not found "
+                        "for this doctor."
+                },
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+
+        # ==========================================
+        # 4. Generate Slots
+        # ==========================================
+
+        slots = (
+            SlotService
+            .get_available_slots(
+                doctor=doctor,
+                doctor_service=doctor_service,
+                appointment_date=appointment_date,
+            )
+        )
+
+
+        # ==========================================
+        # 5. Return Response
+        # ==========================================
+
+        return Response(
+            {
+                "doctor": doctor.id,
+
+                "service": doctor_service.id,
+
+                "date": appointment_date,
+
+                "duration":
+                    doctor_service.duration,
+
+                "slots": [
+                    slot["time"]
+                    for slot in slots
+                    if slot["available"]
+                ],
+            },
+            status=status.HTTP_200_OK,
+        )
+
             

@@ -17,8 +17,8 @@ POST {{baseUrl}}/login/
 Content-Type: application/json
 
 {
-    "email": "patient1@example.com",
-    "password": "NewStrongPassword1234!"
+    "email": "admin@gmail.com",
+    "password": "123"
 }
 
 ###
@@ -121,17 +121,17 @@ GET http://127.0.0.1:8000/api/doctors/1/
 
 ### 3. Create doctor - Admin
 POST http://127.0.0.1:8000/api/doctors/
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg3NjQ4NTkwLCJpYXQiOjE3ODc1NjIxOTAsImp0aSI6ImViNTI3MGMxNTE4NDQ0YTM5YzY2ODU1Y2MwNDAzZmNhIiwidXNlcl9pZCI6IjEifQ.qkjs9HX2vUDqxz42tk2fkguUoSQLk3wQZ5-7zxGLHQM
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg4MDEzOTQ1LCJpYXQiOjE3ODc5Mjc1NDUsImp0aSI6ImQ3YmZjZTRhNjNhZDQwNGQ5NTkwN2Y0YmYzOTRjY2QwIiwidXNlcl9pZCI6IjEifQ.OgpHdAuYFzIACBH4EJSLQ1gtUybfI2EQbs5-27w3emY
 Content-Type: application/json
 
 {
-    "email": "doctor1@example.com",
+    "email": "doctor10@example.com",
     "first_name": "Mohammed",
     "last_name": "Ahmed",
     "phone": "777123456",
     "password": "StrongPassword123!",
     "specialization": "Cardiology",
-    "license_number": "DOC-002",
+    "license_number": "DOC-0010",
     "bio": "Cardiology specialist",
     "consultation_fee": "50.00"
 }
@@ -150,8 +150,16 @@ Content-Type: application/json
     "license_number": "DOC-003",
     "consultation_fee": "30.00"
 }
+###
+### Test Django Routing
+
+GET http://127.0.0.1:8000/api/dashboard-test/
 
 ### 6. Duplicate license number
+GET http://127.0.0.1:8000/api/doctors/dashboard/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg4MTcwNTA2LCJpYXQiOjE3ODgwODQxMDYsImp0aSI6IjIxOGI0ZWZkMDc0OTRkZDBhODliODA1NThjZjVmZmJiIiwidXNlcl9pZCI6IjQifQ.hy8TNE3UEnvSBRqniQkmG0ceNheqx4yRL5-3RZDUsio
+
+### 6. Duplicate license numbereyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg4MTY5NDI3LCJpYXQiOjE3ODgwODMwMjcsImp0aSI6IjZiNzcxOWRiN2E1YjQzZjU4ZDk1ZTBhMTI5MmJlYWM1IiwidXNlcl9pZCI6IjQifQ.unBTAC_z5IJRMlUBqLgxLWeOKSzc89LKJ9lVDtAHOLA
 POST http://127.0.0.1:8000/api/doctors/
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg3NjQ4NTkwLCJpYXQiOjE3ODc1NjIxOTAsImp0aSI6ImViNTI3MGMxNTE4NDQ0YTM5YzY2ODU1Y2MwNDAzZmNhIiwidXNlcl9pZCI6IjEifQ.qkjs9HX2vUDqxz42tk2fkguUoSQLk3wQZ5-7zxGLHQM
 Content-Type: application/json
@@ -172,11 +180,11 @@ Content-Type: application/json
 
 ### 8. Create schedule
 POST http://127.0.0.1:8000/api/doctor-schedules/
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg3NjQ4OTk0LCJpYXQiOjE3ODc1NjI1OTQsImp0aSI6ImEyMDcxOWU0YzYwMjRjYmQ5ODQwM2FiMzJjZDYxZWMyIiwidXNlcl9pZCI6IjQifQ.cuNOCpiDht1XpvmoR2dTZ2cx6mHRKS94t8ftjd3rJHA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg4MTcwOTIxLCJpYXQiOjE3ODgwODQ1MjEsImp0aSI6IjEzMjUyZDdmYmJlMjQ1YjhhYjA1ODVkZGNjMzBmODlhIiwidXNlcl9pZCI6IjQifQ.fSDZkBtyTsVTAX9mWgoi64kuQgvp-tiqOH-KebdbrtA
 Content-Type: application/json
 
 {
-    "day_of_week": 0,
+    "day_of_week": 6,
     "start_time": "09:00:00",
     "end_time": "13:00:00",
     "is_active": true
@@ -210,11 +218,11 @@ GET http://127.0.0.1:8000/api/services/?is_active=True
 
 ### 5. Create service - Admin
 POST http://127.0.0.1:8000/api/services/
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg3NjQ4NTkwLCJpYXQiOjE3ODc1NjIxOTAsImp0aSI6ImViNTI3MGMxNTE4NDQ0YTM5YzY2ODU1Y2MwNDAzZmNhIiwidXNlcl9pZCI6IjEifQ.qkjs9HX2vUDqxz42tk2fkguUoSQLk3wQZ5-7zxGLHQM
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg4MDExNTU2LCJpYXQiOjE3ODc5MjUxNTYsImp0aSI6ImM0NjNmZTcwMjQwNzQ3NjlhMmEzMzY1MzRlNmZjMDNkIiwidXNlcl9pZCI6IjEifQ.BzX19w8eIJavHAEUC-fvWGU5Iy67a0fEIfaZDkqtH68
 Content-Type: application/json
 
 {
-    "name": "Cardiology Consultation",
+    "name": "Cardiology",
     "description": "Specialized cardiology consultation",
     "is_active": true
 }
@@ -269,7 +277,7 @@ Content-Type: application/json
 
 ### 8. My appointments
 GET http://127.0.0.1:8000/api/appointments/
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg3NjQ5OTU0LCJpYXQiOjE3ODc1NjM1NTQsImp0aSI6IjA0ZDAzN2MwMGM3YTQ4YjFhYWE5Y2Q1YTRkMzczODI4IiwidXNlcl9pZCI6IjIifQ.t71pX9Co8A98i4gRo_KSlNSgKmv_JCKueSGOODqxXOo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg4MTczOTMwLCJpYXQiOjE3ODgwODc1MzAsImp0aSI6IjlkNTJjOGE0N2UyZjQ5NDVhZGFlNmViZmE3NWExZDFkIiwidXNlcl9pZCI6IjQifQ.BAOasctti0VMiLsko38OhIRAdI1P9FgqU137r2Pme3I
 
 
 ### =====================================================
@@ -277,8 +285,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiY
 ### =====================================================
 
 ### 10. Confirm appointment
-POST http://127.0.0.1:8000/api/appointments/1/confirm/
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg3NjUwNjY0LCJpYXQiOjE3ODc1NjQyNjQsImp0aSI6IjVlMzRlNDEzN2E4OTRmYTU5ZWZkYWM1NDIwYjdjYzljIiwidXNlcl9pZCI6IjQifQ.M6KfMwfRQsZe7h_j2zMda4Oid8AT8U-Fum-JL-RG8CE
+POST http://127.0.0.1:8000/api/appointments/4/confirm/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg4MTcyNzg0LCJpYXQiOjE3ODgwODYzODQsImp0aSI6ImRiNDIxZDQwYzQ4ODRiMWNhYzliY2U0ZWU3MmI0MDhmIiwidXNlcl9pZCI6IjQifQ.XOfxEqYZdMCK7cg4JYGmNPRjcnt0B3W1s_P3q6k9jy8
 Content-Type: application/json
 
 ### Start Consultation
