@@ -1,0 +1,177 @@
+@import "tailwindcss";
+
+
+/* =========================================
+   THEME
+   ========================================= */
+
+@theme {
+
+    /* Colors */
+
+    --color-primary: #2563eb;
+    --color-primary-dark: #1d4ed8;
+
+    --color-secondary: #0ea5e9;
+
+    --color-dark: #1e293b;
+    --color-light: #f8fafc;
+
+    --color-success: #16a34a;
+    --color-danger: #dc2626;
+
+    /* Font */
+
+    --font-sans: Inter, sans-serif;
+}
+
+
+/* =========================================
+   BASE STYLES
+   ========================================= */
+
+html {
+    scroll-behavior: smooth;
+}
+
+
+@layer base {
+
+    * {
+        @apply box-border;
+    }
+
+
+    body {
+        @apply bg-light text-dark font-sans antialiased;
+        margin: 0;
+    }
+
+
+    img {
+        @apply block max-w-full;
+    }
+
+
+    button {
+        @apply cursor-pointer;
+    }
+}
+
+
+/* =========================================
+   REUSABLE COMPONENTS
+   ========================================= */
+
+@layer components {
+
+
+    /* =====================================
+       Container
+       ===================================== */
+
+    .container-custom {
+        @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+    }
+
+
+
+    /* =====================================
+       Buttons
+       ===================================== */
+
+    .btn-primary {
+        @apply rounded-lg bg-primary px-6 py-3 font-medium text-white transition hover:bg-primary-dark;
+    }
+
+
+    .btn-secondary {
+        @apply rounded-lg bg-secondary px-6 py-3 font-medium text-white transition hover:opacity-90;
+    }
+
+
+    .btn-outline {
+        @apply rounded-lg border border-primary px-6 py-3 font-medium text-primary transition hover:bg-primary hover:text-white;
+    }
+
+
+    .btn-danger {
+        @apply rounded-lg bg-danger px-6 py-3 font-medium text-white transition hover:opacity-90;
+    }
+
+
+
+    /* =====================================
+       Cards
+       ===================================== */
+
+    .card {
+        @apply overflow-hidden rounded-2xl bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg;
+    }
+
+
+
+    /* =====================================
+       Section
+       ===================================== */
+
+    .section {
+        @apply py-12 md:py-16;
+    }
+
+
+    .section-title {
+        @apply text-3xl font-bold md:text-4xl;
+    }
+
+
+    .section-description {
+        @apply mt-3 text-gray-500;
+    }
+
+
+
+    /* =====================================
+       Form
+       ===================================== */
+
+    .form-label {
+        @apply mb-1 block text-sm font-medium text-gray-700;
+    }
+
+
+    .form-input {
+        @apply w-full rounded-lg border border-gray-300 bg-white px-4 py-3 outline-none transition focus:border-primary focus:ring-2 focus:ring-blue-100;
+    }
+
+
+    .form-error {
+        @apply mt-1 text-sm text-danger;
+    }
+
+
+
+    /* =====================================
+       Navbar
+       ===================================== */
+
+    .nav-link {
+        @apply font-medium text-gray-600 transition hover:text-primary;
+    }
+
+
+    .nav-link-active {
+        @apply font-medium text-primary;
+    }
+
+
+
+    /* =====================================
+       Page
+       ===================================== */
+
+    .page-container {
+        @apply min-h-[80vh] px-4 py-8 sm:px-6 lg:px-8;
+    }
+
+}
